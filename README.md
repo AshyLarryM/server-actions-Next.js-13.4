@@ -46,3 +46,4 @@ model Todo {
 }
 ```
 - To push the Todo model to the database, in the CLI run ```npx prisma migrate```
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
