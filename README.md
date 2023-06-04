@@ -46,4 +46,27 @@ model Todo {
 }
 ```
 - To push the Todo model to the database, in the CLI run ```npx prisma migrate```
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+
+**Using Prisma inside of your project:**
+- _Create a file inside of the src directory called **"db.ts"** and add the following code._
+```
+import { PrismaClient } from '@prisma/client'
+
+const globalForPrisma = global as unknown as {
+  prisma: PrismaClient | undefined
+}
+
+export const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: ['query'],
+  })
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+```
+
+## Creating a Route
+- Inside of the "app" directory, create a folder called "new".  This will be our first route for our todo list for us to create a new Todo. Inside of the "new" folder, create a **_page.tsx_** file.  Everything added the page.tsx file will route to the /new route.  We will be creating a new Todo inside of this route.
+ _example: http://localhost:3000/new_
+![App Screenshot](/Users/lawrencemarkel/route-tracker/screenshots/newRoute.png)
+
