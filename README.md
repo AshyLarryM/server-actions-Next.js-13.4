@@ -1,34 +1,48 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Server Actions Demonstration
+This project demonstrates  Get and Post methods to a PostgreSQL database using Next.js 13's server actions, using Prisma as an ORM.
 
-## Getting Started
+## Installation Setup
 
-First, run the development server:
+- _**Installing Next.js 13.4:**_
+    - In your terminal, run ```npx create-next-app@latest``` to install the latest version of Next.js
+       - TypeScript: yes
+        - Tailwind CSS: yes
+        - ES Lint: yes
+        - SRC Directory: yes
+        - App Router: yes
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+- _**Installing Prisma:**_
+    - In your terminal run ```npm install typescript ts-node @types/node --save-dev```
+    - Run ```npm install prisma --save-dev```
+    - Run ```npm i @prisma/client```
+    - Finally, install the Prisma CLI as a development dependency in the project. ```npx prisma init```
+
+    - After those commands are completed, you should have a "prisma" folder at the root level of the directory.  Inside of the "prisma" folder you will have a file named "schema.prisma"
+        - An .env file should have also been created when prisma was installed.
+
+- _**Provisioning PostgreSQL through Railway:**_
+    - Go to https://railway.app/ and create an account for free.  (You get up to 500 hours of DB run time per month for free).  
+    - Click on "Dashboard" once signed in and then "+ new project." Select "provision PostgreSQL Database" and then go to "connect" to get your DATABASE_URL.
+    - Now copy and paste your secret DATABASE_URL into your .env file as ```DATABASE_URL="YOUR SECRET EXAMPLE_DB_URL"```
+**Go into your your "gitignore" file and scroll own to "# LOCAL env files" and add ".env" to avoid posting your DATABASE_URL to your own public repository.**
+```
+# local env files
+.env*.local
+.env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+_Run "prisma db pull" to turn your database scheme into a Prisma schema_
+ 
+## Prisma Schema Setup
+_schema.prisma file_
+ - We are adding the TODO model to have all of our information about the Todo items.
+```
+model Todo {
+  id String @id @default(uuid())
+  title String
+  complete Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+- To push the Todo model to the database, in the CLI run ```npx prisma migrate```
