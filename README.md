@@ -322,4 +322,55 @@ async function toggleTodo(id: string, complete: boolean) {
 await prisma.todo.update({ where: { id }, data: { complete } })
 }
 ```
-**Since we are using an event handler inside of the <TodoItem> component, the component must be a client component.  At the top of the _TodoItem.tsx_ add in** ```'use client'```.  
+**Since we are using an event handler inside of the <TodoItem> component, the component must be a client component.  At the top of the _TodoItem.tsx_ add in** ```'use client'```.
+
+**The final code of the Homepage is the following:**
+```
+import { prisma } from '@/db'
+import Link from 'next/link'
+import { TodoItem } from '@/components/TodoItem'
+
+function getTodos() {
+  return prisma.todo.findMany()
+}
+
+async function toggleTodo(id: string, complete: boolean) {
+  "use server"
+
+await prisma.todo.update({ where: { id }, data: { complete } })
+}
+
+
+export default async function Home() {
+
+  const todos = await getTodos()
+  
+
+  return (
+    <>
+      <header className='flex justify-between mb-4 items-center'>
+        <h1 className='text-2xl'>Todos</h1>
+        <Link className='border border-slate-300 text-slate-300 px-2 py-1 rounded
+        hover:bg-slate-700 focus-within:bg-slate-700 outline-none' href='/new'>
+          New Todos
+        </Link>
+      </header>
+      <ul>
+        {todos.map(todo =>(
+          <TodoItem key={todo.id} {...todo}  toggleTodo={toggleTodo}/>
+        ))}
+      </ul>
+      
+    </>
+  )
+}
+
+```
+
+**We have now created client side interactivity, with functions that are able to be ran on the server through Server Actions".  This gives us the ability to pass data from the client to the server, as well as data from the server to the client.**
+![App Screenshot](screenshots/finalNew.png)
+![App Screenshot](screenshots/congrats.png)
+
+**Check your railway PostgreSQL Database to see the reflected updates for the new Todos, and checked Todos.
+![App Screenshot](screenshots/railway.png)
+
