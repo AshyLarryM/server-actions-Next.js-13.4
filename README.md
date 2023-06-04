@@ -110,8 +110,9 @@ export default async function Home() {
 - This component will be a **server component** since we are using the "app" router. We have the ability in the "app" router to run server code, and send the data to the client.  As long as there are no client actions (useEffect, useState, onChange event listeners etc...)  If make the **default function _async_** we are able to call our database anywhere in our project that we want, and only the data will be shown to the client. By doing this, we can then use prisma inside of this component to get our "test" Todo.
 - After declaring the default async function, we are then intializing our todos in our database and fetching them all from prisma with ```const todos = await prisma.todo.findMany()```
 - The following line is a hardcoded test for creating a new test Todo.
-- In the JSX we map over our todo in a <ul> tag, and list the **id** and **title** from the Todo Schema.  This will display our Todo with the **id** and **title** in the front end now.
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+- In the JSX we map over our todo in a <ul> tag, and list the **id** and **title** from the Todo Schema.  This will display our Todo with the **title** in the front end now.
+    
+![App Screenshot](screenshots/todoFetchTest.png)
 
 ## <TodoItem /> Client Component
 - Inside of the "src" folder create a new folder called "components", and inside of the components folder create a new file called _**Todoitem.tsx**_
@@ -141,7 +142,8 @@ export function TodoItem({ id, title, complete, toggleTodo}: TodoItemProps) {
 
 ```
 - **This is what you should see in your front end.**
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+    
+![App Screenshot](screenshots/NewTodo.png)
 - To update our page.tsx file the app directory with the new properties added in **TodoItem.tsx**, we will update the code with the following.
 ```
 import { prisma } from "@/db"
