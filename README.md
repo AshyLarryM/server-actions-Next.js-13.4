@@ -112,7 +112,7 @@ export default async function Home() {
 - In the JSX we map over our todo in a <ul> tag, and list the **id** and **title** from the Todo Schema.  This will display our Todo with the **id** and **title** in the front end now.
 ![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
 
-## Todo Item Client Component
+## <TodoItem /> Client Component
 - Inside of the "src" folder create a new folder called "components", and inside of the components folder create a new file called _**Todoitem.tsx**_
 - In this TodoItem component, we're creating an input for a checkbox of a Todo item, with some additional Tailwind CSS to give a given checked Todo a line through with a darker color once checked to signify completion of that specific Todo.  Since we are using client interactivity (checkbox) this will be a client component.  To signify we write 'use client' at the top of the component.
 ```
@@ -137,8 +137,11 @@ export function TodoItem({ id, title, complete, toggleTodo}: TodoItemProps) {
     </li>
     </>
 }
+
 ```
-- To update our last page.tsx file with the new properties added in **TodoItem.tsx** we will update the code with the following.
+- **This is what you should see in your front end.**
+![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+- To update our page.tsx file the app directory with the new properties added in **TodoItem.tsx**, we will update the code with the following.
 ```
 import { prisma } from "@/db"
 import Link from 'next/link'
@@ -171,3 +174,149 @@ export default async function Home() {
 ```
 ## New Todos
 **In this component we will create a form for creating a new Todo, and explore using a server action for toggling & updating a todo.**
+  - To add a new Todo we must first create a <form> tag inside of the component. The input="text" and name="title".  We also add some Tailwind CSS classNames to add some basic styling.
+  - Additionally inside of the <form> tag, we are adding a <div> with a **_"cancel"_** <Link> tag inside to go back to the Homepage, and a <button> for submitting our form and eventually pushing the Todo to our Database.  **_Currently our form is "submitting", but it has not been hooked up to any server action yet, so it currently is not completed._**
+  ```
+  export default function Page() {
+  return (
+  <>
+    <header className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl">New</h1>
+    </header>
+    <form className="flex gap-2 flex-col">
+        <input type='text' name="title" className="border border-slate-300
+        bg-transparent rounded px-2 py-1 outline-none
+        focus-within:border-slate-100" 
+    />
+    <div className="flex gap-1 justify-end">
+        <Link href=".." className="border border-slate-300 text-slate-300 px-2 py-1 rounded
+        hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
+        >
+            Cancel
+        </Link>
+        <button type="submit" className="border border-slate-300 text-slate-300 px-2 py-1 rounded
+        hover:bg-slate-700 focus-within:bg-slate-700 outline-none"
+        >
+            Create
+        </button>
+    </div>    
+    </form>
+  </>
+  )
+}
+  ```
+## Creating a Server Action for our Todo Form
+- To start creating a server action in our "new" component, we must create an async function.  We'll call this function **createTodo**, and everything getting passed to this function is a form of data.  In our case it will be "FormData". In order to make this function a "server action" we must add _**"use server"**_ in the top of the function to declare it as such.
+  - This function is explicitly server code, and will never run on the client.
+```
+async function createTodo(data: FormData) {
+    "use server"
+    console.log("Test")
+}
+```
+The above code **will not** run until the experimental server actions option is enabled in the _Next.config.js_ file
+```
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    experimental: {
+        serverActions: true,
+    }
+}
+
+module.exports = nextConfig
+
+```
+- Once these steps are complete, we are ready to use the server action.  To use the server action, add **```action={createTodo}``` inside of the <form> tag.  Now when we submit our form, it is going to call our server action, and for now will log our "test" console.log statement inside of the IDE Terminal and not in our browser console, since it is **NOT** a client component.
+
+- To get our data for our Form title, we pass along the name of the input we want to get. The title has a type of **string | Object | undefined.**. We will create a check to make sure that we recieve a string, and if we do not receive a string, or we recieve an undefined value we will throw an error.
+- Then we will use Prisma to create a new Todo, and after submitting, we will redirect to the home page that displays our Todos.  
+```
+import { prisma } from "@/db";
+import { redirect } from "next/navigation";
+
+async function createTodo(data: FormData) {
+    "use server"
+
+    const title = data.get("title")?.valueOf()
+    if(typeof title !== "string" || title.length === 0) {
+        throw new Error("Invalid Title")
+    }
+
+    await prisma.todo.create({ data: { title, complete:
+         false } })
+    redirect("/")
+}
+```
+## Finshing up
+- In order to have our checkmarks reflect in our database we need to set up an onChange in our <TodoItems> component.  The TodoItem.tsx file should be updated with the following.
+```
+export function TodoItem({ id, title, complete, toggleTodo}: TodoItemProps) {
+    return <>
+    <li className="flex gap-1 items-center">
+        <input id={id} type="checkbox" className="cursor-pointer peer" 
+        defaultChecked={complete}
+        onChange={e => toggleTodo(id, e.target.checked)}
+        />
+        <label htmlFor={id} className="cursor-pointer peer-checked:line-through
+        peer-checked:text-slate-500">
+            {title}
+        </label>
+    </li>
+    </>
+}
+```
+As you can see above, we have added ```defaultChecked={complete}```, and ```onChange={e => toggleTodo(id, e.target.checked)}```
+ - The "complete" value comes from our ***TodoItemProps*** and returns as a boolean value.
+ - The onChange allows us to toggle our Todos, and we will pass in a ***toggleTodo***, and add it to our ***TodoItemProps***
+```
+type TodoItemProps = {
+    id: string
+    title: string
+    complete: boolean
+    toggleTodo: (id: string, complete: boolean) => void
+}
+```
+- Now we will pass toggleTodo to our **<TodoItems />** inside of the ***page.tsx*** file in the app directory.
+```
+import { prisma } from '@/db'
+import Link from 'next/link'
+import { TodoItem } from '@/components/TodoItem'
+
+function getTodos() {
+  return prisma.todo.findMany()
+}
+
+export default async function Home() {
+
+  const todos = await getTodos()
+  
+
+  return (
+    <>
+      <header className='flex justify-between mb-4 items-center'>
+        <h1 className='text-2xl'>Todos</h1>
+        <Link className='border border-slate-300 text-slate-300 px-2 py-1 rounded
+        hover:bg-slate-700 focus-within:bg-slate-700 outline-none' href='/new'>
+          New Todos
+        </Link>
+      </header>
+      <ul>
+        {todos.map(todo =>(
+          <TodoItem key={todo.id} {...todo}  toggleTodo={toggleTodo}/>
+        ))}
+      </ul>
+      
+    </>
+  )
+}
+
+```
+- **Finally we want to run code the server using another server action inside of an async function called "toggleTodos".**
+```
+async function toggleTodo(id: string, complete: boolean) {
+  "use server"
+
+await prisma.todo.update({ where: { id }, data: { complete } })
+}
+```
+**Since we are using an event handler inside of the <TodoItem> component, the component must be a client component.  At the top of the _TodoItem.tsx_ add in** ```'use client'```.  
