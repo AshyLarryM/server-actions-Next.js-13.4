@@ -67,6 +67,7 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 ## Creating a Route
 - Inside of the "app" directory, create a folder called "new".  This will be our first route for our todo list for us to create a new Todo. Inside of the "new" folder, create a **_page.tsx_** file.  Everything added the page.tsx file will route to the /new route.  We will be creating a new Todo inside of this route. _example: http://localhost:3000/new_
+
 ![App Screenshot](screenshots/newRoute.png)
 
 **At the root level of the "app" directory, there is another page.tsx file.  Inside of this file is where we will get our Todos, and update Todos.**
