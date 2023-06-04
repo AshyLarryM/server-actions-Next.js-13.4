@@ -71,7 +71,8 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 ![App Screenshot](screenshots/newRoute.png)
 
 **At the root level of the "app" directory, there is another page.tsx file.  Inside of this file is where we will get our Todos, and update Todos.**
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+
+![App Screenshot](screenshots/pageTSX.png)
 
 **Here is an basic example of creating a todo in with prisma to the PostgreSQL DB**
 
