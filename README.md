@@ -45,7 +45,7 @@ model Todo {
   updatedAt DateTime @updatedAt
 }
 ```
-- To push the Todo model to the database, in the CLI run ```npx prisma migrate```
+- To push the Todo model to the database, in the CLI run ```npx prisma migrate dev```
 
 **Using Prisma inside of your project:**
 - _Create a file inside of the src directory called **"db.ts"** and add the following code._
